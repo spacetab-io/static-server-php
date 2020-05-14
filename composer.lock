@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "df0d4931e15c02d5e3a9183721018832",
+    "content-hash": "6184d2fe235cfe662515a0e7915b1abc",
     "packages": [
         {
             "name": "amphp/amp",
@@ -544,16 +544,16 @@
         },
         {
             "name": "spacetab-io/configuration",
-            "version": "3.0.2",
+            "version": "3.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spacetab-io/configuration-php.git",
-                "reference": "58f3dc34888dcb75380d3a20343c620e7e83bef0"
+                "reference": "10728c286d25150135aaddba027ea82ea0a5dffe"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spacetab-io/configuration-php/zipball/58f3dc34888dcb75380d3a20343c620e7e83bef0",
-                "reference": "58f3dc34888dcb75380d3a20343c620e7e83bef0",
+                "url": "https://api.github.com/repos/spacetab-io/configuration-php/zipball/10728c286d25150135aaddba027ea82ea0a5dffe",
+                "reference": "10728c286d25150135aaddba027ea82ea0a5dffe",
                 "shasum": ""
             },
             "require": {
@@ -566,7 +566,7 @@
                 "humbug/box": "^3.8",
                 "phpstan/phpstan": "^0.12.18",
                 "phpunit/phpunit": "^9",
-                "spacetab-io/logger": "^1.0",
+                "spacetab-io/logger": "^2.0",
                 "symfony/var-dumper": "^4.2 || ^5.0"
             },
             "suggest": {
@@ -592,7 +592,7 @@
                 }
             ],
             "description": "A configuration module for PHP microservices.",
-            "time": "2020-04-13T12:57:42+00:00"
+            "time": "2020-05-14T19:20:38+00:00"
         },
         {
             "name": "spacetab-io/logger",
