@@ -42,18 +42,18 @@ jobs:
       - run: apk add bash
       - run: bash -c "bash <(curl -s https://codecov.io/bash)"
 
-  deploy_latest:
-    machine: true
-    steps:
-      - checkout
-      - run:
-          name: Create docker image for static server
-          command: docker build -t microparts/static-server-php:latest .
-      - run:
-          name: Login to Docker Hub and push image
-          command: |
-            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-            docker push microparts/static-server-php:latest
+#  deploy_latest:
+#    machine: true
+#    steps:
+#      - checkout
+#      - run:
+#          name: Create docker image for static server
+#          command: docker build -t microparts/static-server-php:latest .
+#      - run:
+#          name: Login to Docker Hub and push image
+#          command: |
+#            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+#            docker push microparts/static-server-php:latest
 
 workflows:
   version: 2
@@ -63,10 +63,10 @@ workflows:
       - test_run:
           requires:
             - test_deps
-  deploy_latest:
-    jobs:
-      - deploy_latest:
-          filters:
-            branches:
-              only:
-                - master
+#  deploy_latest:
+#    jobs:
+#      - deploy_latest:
+#          filters:
+#            branches:
+#              only:
+#                - master
