@@ -1,8 +1,8 @@
 Static server
 -------------
 
-[![CircleCI](https://circleci.com/gh/microparts/static-server-php/tree/master.svg?style=svg)](https://circleci.com/gh/microparts/static-server-php/tree/master)
-[![codecov](https://codecov.io/gh/microparts/static-server-php/branch/master/graph/badge.svg)](https://codecov.io/gh/microparts/static-server-php)
+[![CircleCI](https://circleci.com/gh/spacetab-io/static-server-php/tree/master.svg?style=svg)](https://circleci.com/gh/spacetab-io/static-server-php/tree/master)
+[![codecov](https://codecov.io/gh/spacetab-io/static-server-php/branch/master/graph/badge.svg)](https://codecov.io/gh/spacetab-io/static-server-php)
 
 Specific static server with support corporate standard of configuration and more..
 This server is a simple wrapper for nginx or an any web server.
