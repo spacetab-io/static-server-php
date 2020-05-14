@@ -48,12 +48,12 @@ jobs:
 #      - checkout
 #      - run:
 #          name: Create docker image for static server
-#          command: docker build -t microparts/static-server-php:latest .
+#          command: docker build -t spacetabio/static-server-php:latest .
 #      - run:
 #          name: Login to Docker Hub and push image
 #          command: |
 #            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-#            docker push microparts/static-server-php:latest
+#            docker push spacetabio/static-server-php:latest
 
 workflows:
   version: 2

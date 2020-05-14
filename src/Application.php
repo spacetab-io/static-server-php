@@ -3,10 +3,10 @@
 namespace StaticServer;
 
 use LogicException;
-use Microparts\Configuration\Configuration;
-use Microparts\Configuration\ConfigurationAwareInterface;
-use Microparts\Configuration\ConfigurationInterface;
-use Microparts\Logger\Logger;
+use Spacetab\Configuration\Configuration;
+use Spacetab\Configuration\ConfigurationAwareInterface;
+use Spacetab\Configuration\ConfigurationInterface;
+use Spacetab\Logger\Logger;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -22,7 +22,6 @@ use Throwable;
 
 final class Application
 {
-    public const VERSION = '2.0.3';
     private const SERVER_LOG_CHANNEL = 'Server';
 
     private Configuration $conf;
@@ -154,7 +153,7 @@ final class Application
     private function ready(bool $checkConfig = true): void
     {
         $format = 'State: STAGE=%s SHA1=%s VERSION=%s CONFIG_PATH=%s';
-        $message = sprintf($format, $this->stage, $this->sha1, self::VERSION, $this->conf->getPath());
+        $message = sprintf($format, $this->stage, $this->sha1, getenv('SERVER_VERSION'), $this->conf->getPath());
         $this->logger->info($message);
 
         $this->putModifyConfiguratorDependenciesToObject();

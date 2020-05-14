@@ -1,4 +1,4 @@
-FROM roquie/composer-parallel
+FROM composer:1.10
 
 COPY . /app
 
@@ -160,6 +160,7 @@ COPY --from=0 /app/bin/server.phar /usr/bin/server
 COPY --from=0 /app/dist /app
 COPY --from=0 /app/configuration /app/configuration
 
+ARG SERVER_VERSION
 RUN chmod +x /usr/bin/server
 
 EXPOSE 8080

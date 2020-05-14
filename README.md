@@ -22,17 +22,17 @@ Server created for javascript SPA apps like: Vue, React, Angular, etc.
 ## Docker usage
 
 ```Dockerfile
-FROM microparts/static-server-php:2.0.3
+FROM spacetabio/static-server-php:3.0.0
 
 ARG VCS_SHA1
 ARG STAGE
 
-# dist & frontend yaml configuration
+# dist & frontend yaml configuration 
 COPY dist/ /app
 COPY ./configuration /app/configuration
 ```
 
-Full example can be founded [here](./example). And with local use [here](https://github.com/microparts/configuration-js#how-to-usage-library-with-spa-apps).
+Full example can be founded [here](./example). And with local use [here](https://github.com/spacetab-io/configuration-js#how-to-usage-library-with-spa-apps).
 
 ## CLI usage
 

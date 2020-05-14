@@ -2,7 +2,7 @@
 
 namespace StaticServer\Tests\Modifier;
 
-use Microparts\Configuration\Configuration;
+use Spacetab\Configuration\Configuration;
 use Psr\Log\NullLogger;
 use StaticServer\Modifier\Iterator\RecursiveIterator;
 use StaticServer\Modifier\Modify;

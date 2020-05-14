@@ -1,4 +1,4 @@
-FROM node:11-stretch
+FROM node:12-stretch
 WORKDIR /usr/app
 COPY . /usr/app
 
@@ -7,7 +7,7 @@ ARG STAGE
 RUN npm ci --silent \
     && npm run build
 
-FROM microparts/static-server-php:1.0.3
+FROM spacetabio/static-server-php:3.0.0
 
 COPY --from=0 /usr/app/dist /app
 COPY --from=0 /usr/app/configuration /app/configuration

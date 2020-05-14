@@ -6,8 +6,8 @@ use DOMDocument;
 use DOMElement;
 use InvalidArgumentException;
 use Masterminds\HTML5;
-use Microparts\Configuration\ConfigurationAwareInterface;
-use Microparts\Configuration\ConfigurationAwareTrait;
+use Spacetab\Configuration\ConfigurationAwareInterface;
+use Spacetab\Configuration\ConfigurationAwareTrait;
 use StaticServer\Modifier\Iterator\Transfer;
 
 final class InjectConfigFileToIndexModify implements ModifyInterface, ConfigurationAwareInterface

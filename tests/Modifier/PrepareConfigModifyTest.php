@@ -2,7 +2,7 @@
 
 namespace StaticServer\Tests\Modifier;
 
-use Microparts\Configuration\Configuration;
+use Spacetab\Configuration\Configuration;
 use StaticServer\Modifier\SecurityTxtModify;
 use StaticServer\Tests\TestCase;
 use StaticServer\Modifier\Iterator\Transfer;

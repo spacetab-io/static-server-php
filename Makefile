@@ -1,9 +1,9 @@
-IMAGE = microparts/static-server-php
+IMAGE = spacetabio/static-server-php
 VERSION = latest
 FILE = Dockerfile
 
 image:
-	docker build -f $(FILE) -t $(IMAGE):$(VERSION) .
+	docker build -f $(FILE) -t $(IMAGE):$(VERSION) . --build-arg SERVER_VERSION=$(VERSION)
 
 push:
 	docker push $(IMAGE):$(VERSION)

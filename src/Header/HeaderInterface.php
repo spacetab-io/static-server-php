@@ -2,7 +2,7 @@
 
 namespace StaticServer\Header;
 
-use Microparts\Configuration\ConfigurationInterface;
+use Spacetab\Configuration\ConfigurationInterface;
 
 interface HeaderInterface
 {
@@ -28,7 +28,7 @@ interface HeaderInterface
      * Converts headers declared in Yaml configuration to real.
      * Due to backward compatibility.
      *
-     * @param \Microparts\Configuration\ConfigurationInterface $conf
+     * @param \Spacetab\Configuration\ConfigurationInterface $conf
      * @return array<string, string>
      */
     public function convert(ConfigurationInterface $conf): array;
