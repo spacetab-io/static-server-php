@@ -48,7 +48,7 @@ class DefaultPreferencesConfigurator implements ModifyConfiguratorInterface, Con
 
         $mod = new Modify();
 
-        $location = $this->configuration->get('server.modify.sha1_in_config', false)
+        $location = $this->configuration->get('server.modify.sha1InConfig', false)
             ? $this->getConfigName('/__config.js')
             : '/__config.js';
 

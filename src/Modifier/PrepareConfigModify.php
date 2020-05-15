@@ -65,7 +65,7 @@ final class PrepareConfigModify implements ModifyInterface, ConfigurationAwareIn
      */
     private function prepare(Transfer $transfer): string
     {
-        $format = $this->configuration->get('server.log_info');
+        $format = $this->configuration->get('server.modify.consoleLog');
         $message = sprintf($format, $this->stage, $this->vcsSha1);
 
         return sprintf(

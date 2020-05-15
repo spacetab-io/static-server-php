@@ -2,6 +2,7 @@
 configuration/local/
 vendor/
 example/vue-app/dist
+example/vue-app/node_modules
 .phpunit.result.cache
 .DS_Store
 bin/server.phar
