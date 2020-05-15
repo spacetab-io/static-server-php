@@ -3,8 +3,8 @@ VERSION = latest
 FILE = Dockerfile
 
 image:
-	sed "s/{{ version }}/$(VERSION)/g" $(FILE)
-	docker build -f $(FILE) -t $(IMAGE):$(VERSION) .
+	sed "s/{{ version }}/$(VERSION)/g" $(FILE) > /tmp/$(FILE)
+	docker build -f /tmp/$(FILE) -t $(IMAGE):$(VERSION) .
 
 push:
 	docker push $(IMAGE):$(VERSION)
