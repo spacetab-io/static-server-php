@@ -22,7 +22,7 @@ jobs:
       - save_cache:
           paths:
             - ./vendor
-          key: v1-dependencies-{{ checksum "composer.json" }}
+          key: v1-dependencies-{{ checksum "composer.lock" }}
   test_run:
     docker:
       # specify the version you desire here
@@ -34,7 +34,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "composer.json" }}
+            - v1-dependencies-{{ checksum "composer.lock" }}
             - v1-dependencies-
 
       - run: vendor/bin/phpstan analyse src --level 6
