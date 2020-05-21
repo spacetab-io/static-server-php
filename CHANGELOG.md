@@ -1,3 +1,20 @@
+## [3.0.0] - 2020-05-15
+
+### Added
+
+None.
+
+### Changed
+
+* For now server does not supports `prerender.io` (because it unstable) and moving to own software: https://github.com/spacetab-io/prerender-go
+* Changed all snake_case config keys to camelCase and renamed a little.
+* Caches for `index.html` and `__config.js` reduced to `2m` and other caches reduced to `30m`.
+* Restructured and simplified documentation.
+
+### Removed
+
+None.
+
 ## [2.0.3] - 2020-01-27
 
 ### Added

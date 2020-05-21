@@ -2,7 +2,7 @@
 
 namespace StaticServer;
 
-use Microparts\Configuration\Configuration;
+use Spacetab\Configuration\Configuration;
 
 final class Server
 {

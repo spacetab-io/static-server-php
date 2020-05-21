@@ -3,8 +3,8 @@
 namespace StaticServer\Tests\Modifier;
 
 use InvalidArgumentException;
-use Microparts\Configuration\Configuration;
-use Microparts\Configuration\ConfigurationInterface;
+use Spacetab\Configuration\Configuration;
+use Spacetab\Configuration\ConfigurationInterface;
 use StaticServer\Modifier\InjectConfigFileToIndexModify;
 use StaticServer\Tests\TestCase;
 use StaticServer\Modifier\Iterator\Transfer;

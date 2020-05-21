@@ -2,8 +2,8 @@
 
 namespace StaticServer\Modifier;
 
-use Microparts\Configuration\ConfigurationAwareInterface;
-use Microparts\Configuration\ConfigurationAwareTrait;
+use Spacetab\Configuration\ConfigurationAwareInterface;
+use Spacetab\Configuration\ConfigurationAwareTrait;
 use StaticServer\Modifier\Iterator\Transfer;
 
 final class SecurityTxtModify implements ModifyInterface, ConfigurationAwareInterface
@@ -30,8 +30,8 @@ final class SecurityTxtModify implements ModifyInterface, ConfigurationAwareInte
 
         $changed->content = sprintf(
             trim($changed->content),
-            $this->configuration->get('server.security_txt.contact'),
-            $this->configuration->get('server.security_txt.preferred_lang'),
+            $this->configuration->get('server.securityTxt.contact'),
+            $this->configuration->get('server.securityTxt.preferredLang'),
         );
 
         return $changed;

@@ -3,7 +3,7 @@
 namespace StaticServer\Tests\Header;
 
 use InvalidArgumentException;
-use Microparts\Configuration\Configuration;
+use Spacetab\Configuration\Configuration;
 use StaticServer\Header\ConvertsHeader;
 use StaticServer\Tests\TestCase;
 

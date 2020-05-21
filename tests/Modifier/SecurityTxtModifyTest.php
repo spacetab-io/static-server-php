@@ -2,7 +2,7 @@
 
 namespace StaticServer\Tests\Modifier;
 
-use Microparts\Configuration\Configuration;
+use Spacetab\Configuration\Configuration;
 use StaticServer\Modifier\PrepareConfigModify;
 use StaticServer\Tests\TestCase;
 use StaticServer\Modifier\Iterator\Transfer;
@@ -27,10 +27,10 @@ class SecurityTxtModifyTest extends TestCase
 
         $changed = $handler(clone $transfer, $transfer);
 
-        $this->assertRegExp('/window\.__stage=\'local\'/', $changed->content);
-        $this->assertRegExp('/window\.__config=JSON\.parse/', $changed->content);
-        $this->assertRegExp('/window\.__vcs=\'sha1_of_code\'/', $changed->content);
-        $this->assertRegExp('/console\.log/', $changed->content);
+        $this->assertMatchesRegularExpression('/window\.__stage=\'local\'/', $changed->content);
+        $this->assertMatchesRegularExpression('/window\.__config=JSON\.parse/', $changed->content);
+        $this->assertMatchesRegularExpression('/window\.__vcs=\'sha1_of_code\'/', $changed->content);
+        $this->assertMatchesRegularExpression('/console\.log/', $changed->content);
         $this->assertStringNotContainsString('"server":', $changed->content);
     }
 }

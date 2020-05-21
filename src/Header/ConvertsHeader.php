@@ -3,7 +3,7 @@
 namespace StaticServer\Header;
 
 use InvalidArgumentException;
-use Microparts\Configuration\ConfigurationInterface;
+use Spacetab\Configuration\ConfigurationInterface;
 
 final class ConvertsHeader implements HeaderInterface
 {
@@ -13,7 +13,7 @@ final class ConvertsHeader implements HeaderInterface
      *
      * https://tools.ietf.org/html/rfc5988#section-5.5
      *
-     * @param \Microparts\Configuration\ConfigurationInterface $conf
+     * @param \Spacetab\Configuration\ConfigurationInterface $conf
      * @return array<string, string>
      */
     public function convert(ConfigurationInterface $conf): array

@@ -3,8 +3,8 @@
 namespace StaticServer\Modifier\Iterator;
 
 use InvalidArgumentException;
-use Microparts\Configuration\ConfigurationAwareInterface;
-use Microparts\Configuration\ConfigurationAwareTrait;
+use Spacetab\Configuration\ConfigurationAwareInterface;
+use Spacetab\Configuration\ConfigurationAwareTrait;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use RecursiveDirectoryIterator;

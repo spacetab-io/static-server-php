@@ -81,9 +81,9 @@ class NginxHandler extends AbstractHandler
                 'serverPort'              => $this->configuration->get('server.port'),
                 'serverHost'              => $this->configuration->get('server.host'),
                 'prerenderEnabled'        => $this->configuration->get('server.prerender.enabled'),
-                'prerenderCacheTTL'       => $this->configuration->get('server.prerender.cache_ttl'),
-                'CDNUrl'                  => $this->getHostWithoutTrailingSlash('server.prerender.cdn_url'),
-                'CDNPath'                 => $this->configuration->get('server.prerender.cdn_path'),
+                'prerenderCacheTTL'       => $this->configuration->get('server.prerender.cacheTtl'),
+                'CDNUrl'                  => $this->getParamWithoutTrailingSlash('server.prerender.cdnUrl'),
+                'CDNPath'                 => $this->getParamWithoutTrailingSlash('server.prerender.cdnPath'),
                 'prerenderHeaders'        => $this->configuration->get('server.prerender.headers', []),
                 'prerenderResolver'       => $this->configuration->get('server.prerender.resolver', false),
                 'headers'                 => $header->convert($this->configuration),
@@ -148,7 +148,7 @@ class NginxHandler extends AbstractHandler
      *
      * @return bool|string
      */
-    private function getHostWithoutTrailingSlash(string $key)
+    private function getParamWithoutTrailingSlash(string $key)
     {
         if (empty($this->configuration->get($key))) {
             return false;
@@ -185,17 +185,17 @@ class NginxHandler extends AbstractHandler
             return;
         }
 
-        $url = $this->configuration->get('server.prerender.cdn_url', false);
+        $url = $this->configuration->get('server.prerender.cdnUrl', false);
 
         if ( ! $url) {
-            throw new InvalidArgumentException('Prerender CDN URL not set. Check server.prerender.cdn_url config key.');
+            throw new InvalidArgumentException('Prerender CDN URL not set. Check server.prerender.cdnUrl config key.');
         }
 
         $url = (string) parse_url($url, PHP_URL_HOST);
 
         if (strlen($url) < 1) {
             throw new InvalidArgumentException(
-                'Prerender CDN URL is invalid. Check server.prerender.cdn_url config key.'
+                'Prerender CDN URL is invalid. Check server.prerender.cdnUrl config key.'
             );
         }
 
@@ -221,17 +221,17 @@ class NginxHandler extends AbstractHandler
 
         $this->logger->info('Checks prerender CDN url is fill and has a valid url address...');
 
-        $host = $this->configuration->get('server.prerender.cdn_url', '');
+        $host = $this->configuration->get('server.prerender.cdnUrl', '');
 
         if (strlen($host) < 1) {
-            throw new InvalidArgumentException('Prerender CDN url is empty. Check server.prerender.cdn_url config key.');
+            throw new InvalidArgumentException('Prerender CDN url is empty. Check server.prerender.cdnUrl config key.');
         }
 
         $valid = (bool) parse_url($host);
 
         if ( ! $valid) {
             throw new InvalidArgumentException(
-                'Prerender CDN url is invalid (can\'t parse a url). Check server.prerender.cdn_url config key.'
+                'Prerender CDN url is invalid (can\'t parse a url). Check server.prerender.cdnUrl config key.'
             );
         }
     }

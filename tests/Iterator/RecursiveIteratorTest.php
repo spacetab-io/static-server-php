@@ -3,7 +3,7 @@
 namespace StaticServer\Tests\Iterator;
 
 use InvalidArgumentException;
-use Microparts\Configuration\Configuration;
+use Spacetab\Configuration\Configuration;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use StaticServer\Modifier\Iterator\RecursiveIterator;

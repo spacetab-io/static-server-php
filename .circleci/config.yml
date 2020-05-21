@@ -13,7 +13,7 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "composer.json" }}
+            - v1-dependencies-{{ checksum "composer.lock" }}
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
@@ -22,7 +22,7 @@ jobs:
       - save_cache:
           paths:
             - ./vendor
-          key: v1-dependencies-{{ checksum "composer.json" }}
+          key: v1-dependencies-{{ checksum "composer.lock" }}
   test_run:
     docker:
       # specify the version you desire here
@@ -34,7 +34,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "composer.json" }}
+            - v1-dependencies-{{ checksum "composer.lock" }}
             - v1-dependencies-
 
       - run: vendor/bin/phpstan analyse src --level 6
@@ -42,18 +42,18 @@ jobs:
       - run: apk add bash
       - run: bash -c "bash <(curl -s https://codecov.io/bash)"
 
-  deploy_latest:
-    machine: true
-    steps:
-      - checkout
-      - run:
-          name: Create docker image for static server
-          command: docker build -t microparts/static-server-php:latest .
-      - run:
-          name: Login to Docker Hub and push image
-          command: |
-            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-            docker push microparts/static-server-php:latest
+#  deploy_latest:
+#    machine: true
+#    steps:
+#      - checkout
+#      - run:
+#          name: Create docker image for static server
+#          command: docker build -t spacetabio/static-server-php:latest .
+#      - run:
+#          name: Login to Docker Hub and push image
+#          command: |
+#            echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+#            docker push spacetabio/static-server-php:latest
 
 workflows:
   version: 2
@@ -63,10 +63,10 @@ workflows:
       - test_run:
           requires:
             - test_deps
-  deploy_latest:
-    jobs:
-      - deploy_latest:
-          filters:
-            branches:
-              only:
-                - master
+#  deploy_latest:
+#    jobs:
+#      - deploy_latest:
+#          filters:
+#            branches:
+#              only:
+#                - master
