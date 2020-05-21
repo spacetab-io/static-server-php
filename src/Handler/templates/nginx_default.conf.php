@@ -289,10 +289,10 @@ http {
                     set $prerender 0;
                 }
 
-                <?php if ($prerenderResolver):?>
-                    # resolve using Google's DNS/Cloudflare server to force DNS resolution and prevent caching of IPs
-                    resolver <?=$prerenderResolver?>;
-                <?php endif;?>
+            <?php if ($prerenderResolver):?>
+                # resolve using Google's DNS/Cloudflare server to force DNS resolution and prevent caching of IPs
+                resolver <?=$prerenderResolver?>;
+            <?php endif;?>
 
                 # need to redefine $request_uri if it will be "/" but $request_uri is blocked for changes
                 set $req_uri $uri;
@@ -300,17 +300,25 @@ http {
                   set $req_uri "/index";
                 }
 
+              <?php if(count($prerenderQueryParams)):?>
+                set $q "";
+              <?php foreach($prerenderQueryParams as $key):?>
+                if ($args ~ "<?php echo $key?>=([^&]*)(?=&)*") {
+                  set $q "$q-<?php echo $key?>=$1";
+                }
+              <?php endforeach;?>
+              <?php endif;?>
                 if ($prerender = 1) {
                     #setting prerender as a variable forces DNS resolution since nginx caches IPs and doesnt play well with load balancing
-                    rewrite .* <?=$CDNPath?>$req_uri.html?$query_string break;
+                    rewrite .* <?=$CDNPath?>$req_uri$q break;
                     proxy_pass "<?=$CDNUrl?>";
                     break;
                 }
 
                 if ($prerender = 0) {
-                    <?php foreach($headers as $name => $value):?>
+                  <?php foreach($headers as $name => $value):?>
                     add_header "<?=$name?>" "<?=addslashes($value)?>";
-                    <?php endforeach;?>
+                  <?php endforeach;?>
                     expires 30m;
                     add_header "Cache-Control" "public, max-age=1800";
 
