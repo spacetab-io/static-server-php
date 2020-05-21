@@ -11,3 +11,7 @@ push:
 
 run:
 	docker run --rm -it --init -p 8088:8080 $(IMAGE):$(VERSION)
+
+test:
+	docker run -w /app --entrypoint bash --rm -it --init -v `pwd`/:/app \
+		spacetabio/static-server-php:3.1.0-xdebug -c "vendor/bin/phpunit"

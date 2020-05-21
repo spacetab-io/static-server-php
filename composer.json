@@ -38,5 +38,11 @@
     "psr-4": {
       "StaticServer\\Tests\\": "tests"
     }
+  },
+  "scripts": {
+    "test": [
+      "phpstan analyse src --level 6",
+      "phpunit"
+    ]
   }
 }

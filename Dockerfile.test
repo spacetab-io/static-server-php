@@ -1,4 +1,4 @@
-FROM roquie/composer-parallel
+FROM roquie/composer-parallel:1
 
 COPY . /app
 

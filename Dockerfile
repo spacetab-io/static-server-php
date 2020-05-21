@@ -1,4 +1,4 @@
-FROM composer:1.10
+FROM roquie/composer-parallel:1
 
 COPY . /app
 

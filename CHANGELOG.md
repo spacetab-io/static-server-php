@@ -1,3 +1,17 @@
+## [3.1.0] - 2020-05-21
+
+### Added
+
+* Server preserves query params in prerender proxy pass.
+
+### Changed
+
+None.
+
+### Removed
+
+None.
+
 ## [3.0.0] - 2020-05-15
 
 ### Added
