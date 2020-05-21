@@ -82,6 +82,7 @@ class NginxHandler extends AbstractHandler
                 'serverHost'              => $this->configuration->get('server.host'),
                 'prerenderEnabled'        => $this->configuration->get('server.prerender.enabled'),
                 'prerenderCacheTTL'       => $this->configuration->get('server.prerender.cacheTtl'),
+                'prerenderQueryParams'    => $this->getSorted('server.prerender.queryParams'),
                 'CDNUrl'                  => $this->getParamWithoutTrailingSlash('server.prerender.cdnUrl'),
                 'CDNPath'                 => $this->getParamWithoutTrailingSlash('server.prerender.cdnPath'),
                 'prerenderHeaders'        => $this->configuration->get('server.prerender.headers', []),
@@ -155,6 +156,20 @@ class NginxHandler extends AbstractHandler
         }
 
         return rtrim($this->configuration->get($key), '/');
+    }
+
+    /**
+     * @param string $key
+     * @param array<mixed>  $default
+     *
+     * @return bool|string
+     */
+    private function getSorted(string $key, array $default = [])
+    {
+        $array = $this->configuration->get($key, $default);
+        sort($array);
+
+        return $array;
     }
 
     /**
