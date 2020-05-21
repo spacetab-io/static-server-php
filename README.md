@@ -1,6 +1,3 @@
-**PERMANENTLY MOVED TO** https://github.com/spacetab-io/static-server-php
-
-
 Static server
 -------------
 
