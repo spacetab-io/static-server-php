@@ -24,6 +24,7 @@ defaults:
       queryParams: [] # params that will be passed to CDN to find files. Params are sorted alphabetically.
       cdnUrl: null # CDN url
       cdnPath: / # CDN folder relative to root path  with trailing slash (/)
+      cdnFilePostfix: null
       url: null # Proxy pass URL for bots, with schema.
       resolver: "8.8.8.8 8.8.4.4 1.1.1.1 1.0.0.1" # nginx "resolver" option to force DNS resolution and prevent caching of IPs
       headers: [] # Authorization headers (or others), format: key - $headerName, value - $headerValue

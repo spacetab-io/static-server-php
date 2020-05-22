@@ -85,6 +85,7 @@ class NginxHandler extends AbstractHandler
                 'prerenderQueryParams'    => $this->getSorted('server.prerender.queryParams'),
                 'CDNUrl'                  => $this->getParamWithoutTrailingSlash('server.prerender.cdnUrl'),
                 'CDNPath'                 => $this->getParamWithoutTrailingSlash('server.prerender.cdnPath'),
+                'CDNFilePostfix'          => $this->configuration->get('server.prerender.cdnFilePostfix', null),
                 'prerenderHeaders'        => $this->configuration->get('server.prerender.headers', []),
                 'prerenderResolver'       => $this->configuration->get('server.prerender.resolver', false),
                 'headers'                 => $header->convert($this->configuration),
@@ -159,8 +160,8 @@ class NginxHandler extends AbstractHandler
     }
 
     /**
-     * @param string $key
-     * @param array<mixed>  $default
+     * @param string       $key
+     * @param array<mixed> $default
      *
      * @return bool|string
      */
