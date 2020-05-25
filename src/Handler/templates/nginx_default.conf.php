@@ -310,7 +310,7 @@ http {
               <?php endif;?>
                 if ($prerender = 1) {
                     #setting prerender as a variable forces DNS resolution since nginx caches IPs and doesnt play well with load balancing
-                    rewrite .* <?=$CDNPath?>$req_uri$q break;
+                    rewrite .* <?= $CDNPath ?>$req_uri$q<?= ($CDNFilePostfix) ? "-" . $CDNFilePostfix : null ?> break;
                     proxy_pass "<?=$CDNUrl?>";
                     break;
                 }

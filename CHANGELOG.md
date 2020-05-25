@@ -1,3 +1,17 @@
+## [3.1.1] - 2020-05-22
+
+### Added
+
+* Prerender cdn file postfix that is adding through config param.
+
+### Changed
+
+None.
+
+### Removed
+
+None.
+
 ## [3.1.0] - 2020-05-21
 
 ### Added
