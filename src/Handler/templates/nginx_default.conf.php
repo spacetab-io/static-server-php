@@ -1,3 +1,5 @@
+daemon off;
+
 # you must set worker processes based on your CPU cores, nginx does not benefit from setting more than that
 worker_processes auto;
 
