@@ -1,5 +1,5 @@
 IMAGE = spacetabio/static-server-php
-VERSION = latest
+VERSION = 3.2.1
 FILE = Dockerfile
 
 image:

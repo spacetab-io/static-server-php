@@ -1,3 +1,21 @@
+## [3.2.1] - 2020-06-03
+
+### Added
+
+None.
+
+### Changed
+
+None.
+
+### Removed
+
+None.
+
+### Fixed
+
+* Nginx `daemon off;` option as default.
+
 ## [3.2.0] - 2020-05-22
 
 ### Added
