@@ -1,13 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace StaticServer\Modifier\Iterator;
+
+use Amp\Promise;
 
 interface IteratorInterface
 {
     /**
      * Iterate files in server.root.
      *
-     * @return iterable<\StaticServer\Modifier\Iterator\Transfer>
+     * @return Promise<iterable<\StaticServer\Modifier\Iterator\Transfer>>
      */
-    public function iterate(): iterable;
+    public function iterate(): Promise;
 }

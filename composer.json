@@ -8,7 +8,7 @@
     }
   ],
   "require": {
-    "php": ">=7.4",
+    "php": "^8",
     "ext-json": "*",
     "ext-dom": "*",
     "ext-pcntl": "*",
@@ -20,7 +20,10 @@
     "symfony/filesystem": "^4 || ^5",
     "symfony/process": "^4 || ^5",
     "league/plates": "^3.3",
-    "geerlingguy/ping": "^1.2"
+    "geerlingguy/ping": "^1.2",
+    "amphp/file": "dev-master#7abe3d5f27a55613b248cc365d5691ccd343591e",
+    "amphp/http-client": "^4.5",
+    "amphp/process": "^1.1"
   },
   "require-dev": {
     "roave/security-advisories": "dev-master",

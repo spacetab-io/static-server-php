@@ -1,75 +1,100 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace StaticServer\Modifier\Iterator;
 
-use InvalidArgumentException;
+use Amp\File\Filesystem;
+use Amp\Promise;
 use Spacetab\Configuration\ConfigurationAwareInterface;
 use Spacetab\Configuration\ConfigurationAwareTrait;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
-use RuntimeException;
+use function Amp\call;
 
 final class RecursiveIterator implements IteratorInterface, ConfigurationAwareInterface, LoggerAwareInterface
 {
     use ConfigurationAwareTrait, LoggerAwareTrait;
 
+    private Filesystem $filesystem;
+
+    /**
+     * RecursiveIterator constructor.
+     *
+     * @param \Amp\File\Filesystem $filesystem
+     */
+    public function __construct(Filesystem $filesystem)
+    {
+        $this->filesystem = $filesystem;
+    }
+
     /**
      * Iterate files in server.root.
      *
-     * @return iterable<Transfer>
+     * @return Promise<iterable<Transfer>>
      */
-    public function iterate(): iterable
+    public function iterate(): Promise
     {
-        $path = $this->getRootPath();
+        return call(fn() =>
+            yield (yield from $this->fromDirectoryTreeToFlattenDTO(
+                yield $this->getRootPath()
+            ))
+        );
+    }
 
-        $directory = new RecursiveDirectoryIterator($path);
-        $iterator = new RecursiveIteratorIterator($directory);
+    /**
+     * @param string $path
+     * @return \Generator
+     */
+    private function fromDirectoryTreeToFlattenDTO(string $path): \Generator
+    {
+        static $promises = [];
 
-        /** @var RecursiveDirectoryIterator $item */
-        foreach ($iterator as $item) {
-            if ($item->isDir()) {
-                continue;
+        foreach (yield $this->filesystem->listFiles($path) as $file) {
+            $location = "{$path}/{$file}";
+
+            if (yield $this->filesystem->isDirectory($location)) {
+                yield from $this->fromDirectoryTreeToFlattenDTO($location);
+            } else {
+                $this->logger->debug("Iterator. Processing file: {$location}");
+
+                $promises[] = call(function () use ($file, $location, $path) {
+                    $transfer = new Transfer();
+                    $transfer->filename  = $file;
+                    $transfer->realpath  = $location;
+                    $transfer->extension = pathinfo($location, PATHINFO_EXTENSION);
+                    $transfer->location  = $path;
+                    $transfer->content   = yield $this->filesystem->read($location);
+
+                    return $transfer;
+                });
             }
-
-            if (substr($item->getFilename(), 0, 1) === '.') {
-                continue;
-            }
-
-            $realpath = $item->getRealPath();
-
-            $this->logger->debug('Iterator. Processing real file: ' . $realpath);
-
-            if (!$realpath) {
-                throw new RuntimeException('Unexpected error.');
-            }
-
-            $transfer = new Transfer();
-            $transfer->filename  = $item->getFilename();
-            $transfer->realpath  = $realpath;
-            $transfer->extension = $item->getExtension();
-            $transfer->location  = substr($realpath, strlen($path));
-            $transfer->content   = (string) file_get_contents($realpath);
-
-            yield $transfer;
         }
+
+        return $promises;
     }
 
     /**
      * Check if server.root is exists and get realpath.
      *
-     * @return string
+     * @return Promise<string>
      */
-    private function getRootPath(): string
+    private function getRootPath(): Promise
     {
-        $root = realpath($this->configuration->get('server.root'));
+        $path = $this->configuration->get('server.root');
 
-        // If it exist, check if it's a directory
-        if($root !== false && is_dir($root)) {
-            return $root;
-        }
+        return call(function () use ($path) {
+            $check = yield [
+                $this->filesystem->exists($path),
+                $this->filesystem->isDirectory($path)
+            ];
 
-        throw new InvalidArgumentException('Root server directory not found or it is not directory.');
+            // Funny check.
+            if (array_filter($check, fn($x) => $x === true) === []) {
+                throw new \InvalidArgumentException('Root server directory not found or it is not a directory.');
+            }
+
+            return $path;
+        });
     }
 }

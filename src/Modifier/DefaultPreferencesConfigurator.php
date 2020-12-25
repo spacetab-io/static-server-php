@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace StaticServer\Modifier;
 
@@ -11,15 +13,8 @@ class DefaultPreferencesConfigurator implements ModifyConfiguratorInterface, Con
 {
     use ConfigurationAwareTrait, LoggerAwareTrait;
 
-    /**
-     * @var string
-     */
-    private string $stage = '';
-
-    /**
-     * @var string
-     */
-    private string $sha1 = '';
+    private string $stage;
+    private string $sha1;
 
     /**
      * DefaultPreferencesConfigurator constructor.
