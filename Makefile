@@ -19,6 +19,9 @@ test:
 image_test:
 	docker build -t $(IMAGE):4.0.0-xdebug -f test.dockerfile .
 
+push_test:
+	docker build -t $(IMAGE):4.0.0-xdebug -f test.dockerfile .
+
 image_box:
 	docker build -t spacetabio/box-php:1.0.0 -f box.dockerfile .
 
