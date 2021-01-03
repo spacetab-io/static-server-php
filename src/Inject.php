@@ -102,7 +102,7 @@ final class Inject
 
         return call(function () use ($path) {
             $dom = new DOMDocument('1.0', 'utf-8');
-            $dom->loadHTML(yield File\read($path));
+            @$dom->loadHTML(yield File\read($path));
 
             $script = $dom->createElement('script');
             $script->setAttribute('src', '/__config.js');
