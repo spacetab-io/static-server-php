@@ -4,6 +4,3 @@ defaults:
     port: 8080
     root: /app
     index: index.html
-
-
-

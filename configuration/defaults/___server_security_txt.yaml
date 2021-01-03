@@ -3,6 +3,3 @@ defaults:
     securityTxt:
       contact: "security@spacetab.io"
       preferredLang: "en, ru"
-
-
-
