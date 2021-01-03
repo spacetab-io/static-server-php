@@ -18,6 +18,7 @@ None.
 * 99% backward compatibility.
 * Using asynchronous non-blocking i/o.
 * Web-server configuration files separated to easily configuring.
+* Improved error handling.
 
 ### Removed
 
