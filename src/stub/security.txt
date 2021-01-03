@@ -1,2 +1,0 @@
-Contact: %s
-Preferred-Languages: %s

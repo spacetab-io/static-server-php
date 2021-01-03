@@ -1,3 +1,36 @@
+## [4.0.0] - 2020-01-03
+
+### Added
+
+None.
+
+### Changed
+
+* Upgrades Composer to `2.0` version.
+* Upgrades NGINX to `1.19.6` version.
+* Upgrades NGINX Brotli Module to `1.0.9` version.
+* Upgrades PHP to `8.0` version.
+* Upgrades PHPUNIT configuration file to new schema.
+* Update LICENSE and README year from 2020 to 2021 🎇
+* Completely rewritten sources code and now it became more simplified.
+* PHP performs the role of "template engine" to generate NGINX configuration 
+  and read/forward the `Spacetab` configuration. Does not control the NGINX process.
+* 99% backward compatibility.
+* Using asynchronous non-blocking i/o.
+* Web-server configuration files separated to easily configuring.
+
+### Removed
+
+* Removed `box-project/box` from project dependencies. Now uses separated docker image to build a phar-archive.
+* Removed code which is responsible for dist-code modification. Because is too hard for understanding and this project 
+  is too small for such an abstraction layer. Now dist-code modification is enabled by default and no option to 
+  disable it.
+* A lot of many composer packages that no need anymore... 
+
+### Fixed
+
+* A potential fix of bug when web-server spawn zombie processes.
+
 ## [3.2.1] - 2020-06-03
 
 ### Added
@@ -107,11 +140,10 @@ cloud-services or local instances.
 
 - Option `server.prerender.token`. Use `server.prerender.headers` option.
 
-
 ## [2.0.0] - 2020-01-09
 
 Released new version of SPA-webserver.
 Full backward compatibility with previous 1.0.0 version except
-compression options (it not configurable more). From this version
+compression options (it is not configurable more). From this version
 changelog will be started.
 

@@ -1,4 +1,4 @@
 {
-  "output": "bin/server.phar",
-  "main": "bin/server"
+  "output": "bin/template.phar",
+  "main": "bin/template"
 }

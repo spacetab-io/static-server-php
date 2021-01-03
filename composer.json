@@ -8,41 +8,45 @@
     }
   ],
   "require": {
-    "php": ">=7.4",
-    "ext-json": "*",
+    "php": "^8.0",
     "ext-dom": "*",
-    "ext-pcntl": "*",
-    "ext-posix": "*",
-    "spacetab-io/configuration": "3.*",
-    "masterminds/html5": "^2.5",
-    "symfony/console": "^4 || ^5",
-    "spacetab-io/logger": "^2.0",
-    "symfony/filesystem": "^4 || ^5",
-    "symfony/process": "^4 || ^5",
+    "ext-json": "*",
+    "ext-simplexml": "*",
+    "amphp/amp": "^2.5",
+    "amphp/file": "dev-master#7abe3d5f27a55613b248cc365d5691ccd343591e",
+    "amphp/http-client": "^4.5",
+    "amphp/process": "^1.1",
     "league/plates": "^3.3",
-    "geerlingguy/ping": "^1.2"
+    "spacetab-io/configuration": "3.*",
+    "spacetab-io/logger": "^2",
+    "symfony/console": "^5"
   },
   "require-dev": {
-    "roave/security-advisories": "dev-master",
-    "symfony/var-dumper": "^4 || ^5",
+    "amphp/phpunit-util": "^1.4",
+    "jetbrains/phpstorm-attributes": "^1.0",
+    "phpstan/phpstan": "^0.12",
     "phpunit/phpunit": "^9",
-    "humbug/box": "^3.8",
-    "phpstan/phpstan": "^0.12"
+    "roave/security-advisories": "dev-master",
+    "symfony/var-dumper": "^5"
   },
   "autoload": {
     "psr-4": {
-      "StaticServer\\": "src"
+      "Spacetab\\Server\\": "src"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "StaticServer\\Tests\\": "tests"
+      "Spacetab\\Tests\\Server\\": "tests"
     }
   },
   "scripts": {
     "test": [
-      "phpstan analyse src --level 6",
-      "phpunit"
+      "phpstan analyse src --level 4",
+      "XDEBUG_MODE=coverage phpunit --coverage-text"
     ]
+  },
+  "config": {
+    "sort-packages": true,
+    "optimize-autoloader": true
   }
 }

@@ -1,0 +1,8 @@
+not_pingable_prerender:
+  server:
+    port: 8081
+    root: ./tests/example_dist/simple
+    prerender:
+      enabled: true
+      cdnUrl: http://d23d23d23d23d-123a.com
+

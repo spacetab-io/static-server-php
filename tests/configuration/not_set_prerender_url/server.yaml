@@ -1,0 +1,8 @@
+not_set_prerender_url:
+  server:
+    port: 8081
+    root: ./tests/example_dist/simple
+    prerender:
+      enabled: true
+      cdnUrl: ""
+

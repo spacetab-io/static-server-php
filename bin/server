@@ -1,46 +1,44 @@
-#!/usr/bin/env php
-<?php
+#!/bin/sh
 
-use Spacetab\Logger\Logger;
-use StaticServer\Application as Server;
-use StaticServer\Console\DumpConfigCommand;
-use StaticServer\Console\ReloadServerCommand;
-use StaticServer\Console\RunServerCommand;
-use StaticServer\Console\SignalHandler;
-use StaticServer\Console\StopServerCommand;
-use Symfony\Component\Console\Application;
+set -e
 
-$locations = [
-    __DIR__ . '/../../../autoload.php',
-    __DIR__ . '/../vendor/autoload.php',
-    __DIR__ . '/vendor/autoload.php'
-];
+# export PATH="$PATH:$(pwd)/bin"
 
-foreach ($locations as $file) {
-    if (file_exists($file)) {
-        require_once $file;
-        break;
-    }
+SERVER_CONFIG_PATH="$(template handler --dump config)"
+
+CLEAR='\033[0m'
+RED='\033[0;31m'
+
+usage() {
+  echo "Static webserver. Version: $SERVER_VERSION"
+  if [ -n "$1" ]; then
+    echo "${RED}👉 $1${CLEAR}\n";
+  fi
+  echo "Usage: $0 [ run | reload | stop | dump ]"
+  echo ""
+  echo "Example: $0 run or STAGE=local $0 run"
+  exit 1
 }
 
-$logger = Logger::default('Fatal');
+while [ "$#" -gt 0 ]; do
+    case $1 in
+        run) run=1; ;;
+        reload) reload=1; ;;
+        stop) stop=1; ;;
+        dump) dump=1; ;;
+        *) usage "Unknown parameter passed: $1" ;;
+    esac
+    shift
+done
 
-pcntl_async_signals(true);
-
-$sig = new SignalHandler();
-pcntl_signal(SIGTERM, [$sig, 'handle']);
-pcntl_signal(SIGINT, [$sig, 'handle']);
-pcntl_signal(SIGQUIT, [$sig, 'handle']);
-pcntl_signal(SIGUSR1, [$sig, 'handle']);
-
-try {
-    $app = new Application('Static server', getenv('SERVER_VERSION'));
-    $app->add(new RunServerCommand());
-    $app->add(new StopServerCommand());
-    $app->add(new DumpConfigCommand());
-    $app->add(new ReloadServerCommand());
-    $app->run();
-} catch (Throwable $e) {
-    $logger->critical($e->getMessage(), ['trace' => $e->getTraceAsString()]);
-    exit(1);
-}
+if [ "$run" = "1" ]; then
+  template generate && nginx -c "$SERVER_CONFIG_PATH"
+elif [ "$reload" = "1" ]; then
+  template generate && nginx -c "$SERVER_CONFIG_PATH" -s reload
+elif [ "$stop" = "1" ]; then
+  template generate && nginx -c "$SERVER_CONFIG_PATH" -s stop
+elif [ "$dump" = "1" ]; then
+  template dump
+else
+  usage
+fi

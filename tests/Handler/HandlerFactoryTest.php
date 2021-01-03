@@ -1,24 +1,29 @@
-<?php declare(strict_types=1);
+<?php
 
-namespace StaticServer\Tests\Handler;
+declare(strict_types=1);
 
-use InvalidArgumentException;
-use StaticServer\Handler\HandlerFactory;
-use StaticServer\Handler\NginxHandler;
-use StaticServer\Tests\TestCase;
+namespace Spacetab\Tests\Server\Handler;
+
+use Spacetab\Configuration\Configuration;
+use Spacetab\Server\Exception\HandlerException;
+use Spacetab\Server\Handler\HandlerFactory;
+use Spacetab\Server\Handler\NginxHandler;
+use Spacetab\Tests\Server\TestCase;
 
 class HandlerFactoryTest extends TestCase
 {
-    public function testHowFactoryCreatesObjects()
-    {
-        $object = HandlerFactory::createHandler('nginx', ['pid' => '', 'config' => '']);
 
-        $this->assertInstanceOf(NginxHandler::class, $object);
-    }
-
-    public function testHowFactoryHandleTheInvalidParams()
+    public function testCreateHandler()
     {
-        $this->expectException(InvalidArgumentException::class);
-        HandlerFactory::createHandler('random', []);
+        $conf = new Configuration(__DIR__ . '/../configuration', 'tests');
+        $conf->load();
+
+        $factory = new HandlerFactory($conf);
+
+        $this->assertInstanceOf(NginxHandler::class, $factory->createHandler('nginx'));
+
+        $this->expectException(HandlerException::class);
+        $this->expectExceptionMessageMatches('/`whoops` – handler not supported.*/');
+        $factory->createHandler('whoops');
     }
 }

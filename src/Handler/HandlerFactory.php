@@ -1,23 +1,41 @@
-<?php declare(strict_types=1);
+<?php
 
-namespace StaticServer\Handler;
+declare(strict_types=1);
 
-use InvalidArgumentException;
+namespace Spacetab\Server\Handler;
 
-class HandlerFactory
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+use Spacetab\Configuration\ConfigurationInterface;
+use Spacetab\Server\Exception\HandlerException;
+
+final class HandlerFactory
 {
+    private ConfigurationInterface $conf;
+    private ?LoggerInterface $logger;
+
+    /**
+     * HandlerFactory constructor.
+     *
+     * @param \Spacetab\Configuration\ConfigurationInterface $conf
+     * @param \Psr\Log\LoggerInterface|null $logger
+     */
+    public function __construct(ConfigurationInterface $conf, ?LoggerInterface $logger = null)
+    {
+        $this->conf   = $conf;
+        $this->logger = $logger ?: new NullLogger();
+    }
+
     /**
      * @param string $name
-     * @param array<string, string> $options
-     * @return \StaticServer\Handler\NginxHandler
+     * @return \Spacetab\Server\Handler\HandlerInterface
+     * @throws \Spacetab\Server\Exception\HandlerException
      */
-    public static function createHandler(string $name, array $options = [])
+    public function createHandler(string $name): HandlerInterface
     {
-        switch ($name) {
-            case 'nginx':
-                return new NginxHandler($options);
-        }
-
-        throw new InvalidArgumentException('Handler does not exists or not defined here.');
+        return match ($name) {
+            HandlerInterface::HANDLER_NGINX => new NginxHandler($this->conf, $this->logger),
+            default => throw HandlerException::handlerNotSupported($name)
+        };
     }
 }

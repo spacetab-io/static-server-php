@@ -1,28 +1,41 @@
-<?php declare(strict_types=1);
+<?php
 
-namespace StaticServer\Header;
+declare(strict_types=1);
 
-use InvalidArgumentException;
+namespace Spacetab\Server\Header;
+
 use Spacetab\Configuration\ConfigurationInterface;
+use Spacetab\Server\Exception\HeaderException;
 
 final class ConvertsHeader implements HeaderInterface
 {
+    private ConfigurationInterface $conf;
+
+    /**
+     * ConvertsHeader constructor.
+     *
+     * @param \Spacetab\Configuration\ConfigurationInterface $conf
+     */
+    public function __construct(ConfigurationInterface $conf)
+    {
+        $this->conf = $conf;
+    }
+
     /**
      * Converts headers declared in Yaml configuration to real.
      * Due to backward compatibility.
-     *
      * https://tools.ietf.org/html/rfc5988#section-5.5
      *
-     * @param \Spacetab\Configuration\ConfigurationInterface $conf
      * @return array<string, string>
+     * @throws \Spacetab\Server\Exception\HeaderException
      */
-    public function convert(ConfigurationInterface $conf): array
+    public function convert(): array
     {
         $results = [];
 
-        foreach ($conf->get('server.headers') as $header => $values) {
+        foreach ($this->conf->get('server.headers') as $header => $values) {
             if (!isset(self::CONFIG_MAP[$header])) {
-                throw new InvalidArgumentException('Header not supported.');
+                throw HeaderException::invalidHeaderNameParameterPassed($header);
             }
 
             $item = self::CONFIG_MAP[$header];
@@ -37,7 +50,7 @@ final class ConvertsHeader implements HeaderInterface
                 $array = [];
                 foreach ($values as $value) {
                     if (!isset($value['value'])) {
-                        throw new InvalidArgumentException('Invalid header format, see docs & examples.');
+                        throw HeaderException::invalidHeaderFormat();
                     }
 
                     $array[] = join('; ', (array) $value['value']);

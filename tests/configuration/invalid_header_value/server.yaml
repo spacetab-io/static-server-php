@@ -7,5 +7,3 @@ invalid_header_value:
         - 123
     port: 8081
     root: ./tests/example_dist/simple
-    modify:
-      root: ./tests/example_dist/simple/modified

@@ -1,15 +1,19 @@
-<?php declare(strict_types=1);
+<?php
 
-namespace StaticServer\Handler;
+declare(strict_types=1);
 
-use StaticServer\Header\HeaderInterface;
+namespace Spacetab\Server\Handler;
+
+use Amp\Promise;
 
 interface HandlerInterface
 {
-    public function checkDependenciesBeforeStart(): void;
-    public function generateConfig(HeaderInterface $header): void;
-    public function checkConfig(): void;
-    public function start(): void;
-    public function reload(): void;
-    public function stop(): void;
+    public const HANDLER_NGINX = 'nginx';
+
+    /**
+     * Generates web server configuration.
+     *
+     * @return Promise<null>
+     */
+    public function handle(): Promise;
 }

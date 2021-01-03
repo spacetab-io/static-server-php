@@ -5,8 +5,6 @@ defaults:
     root: /app
     index: index.html
     modify:
-      enabled: true # Enables or disables files modifying to use a frontend app with yaml configuration.
-      root: /app/modified # Location where changed files from server.root will be located.
       # modify.inject Values: head, before_script
       # head -> Injects the __config.js to top of <head> tag. It will be block content rendering, so not recommended.
       # before_script -> Injects the __config.js before first <script> tag in DOM document. Better than `head` variant.
@@ -16,13 +14,14 @@ defaults:
     handler:
       name: nginx
       options:
-        pid: ~/.server/spa_nginx.pid
-        config: ~/.server/generated_nginx.conf
+        pid: /tmp/.server/spa_nginx.pid
+        config: /tmp/.server/generated_nginx.conf
     prerender:
       enabled: false
       cacheTtl: 24h # by default cache lives 24 hours
-      cdnUrl: null
+      cdnUrl: "https://google.com"
       cdnPath: / # CDN folder relative to root path (/)
+      cdnFilePostfix: null
       url: null # Proxy pass URL for bots, with schema.
       resolver: "8.8.8.8 8.8.4.4 1.1.1.1 1.0.0.1" # nginx "resolver" option to force DNS resolution and prevent caching of IPs
       headers: [] # Authorization headers (or others), format: key - $headerName, value - $headerValue

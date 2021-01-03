@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
 
-namespace StaticServer\Tests\Header;
+declare(strict_types=1);
 
-use InvalidArgumentException;
+namespace Spacetab\Tests\Server\Header;
+
 use Spacetab\Configuration\Configuration;
-use StaticServer\Header\ConvertsHeader;
-use StaticServer\Tests\TestCase;
+use Spacetab\Server\Exception\HeaderException;
+use Spacetab\Server\Header\ConvertsHeader;
+use Spacetab\Tests\Server\TestCase;
 
 class HeaderTest extends TestCase
 {
@@ -14,8 +16,8 @@ class HeaderTest extends TestCase
         $conf = new Configuration(__DIR__ . '/../configuration', 'nested');
         $conf->load();
 
-        $ch = new ConvertsHeader();
-        $headers = $ch->convert($conf);
+        $ch = new ConvertsHeader($conf);
+        $headers = $ch->convert();
 
         $featurePolicy = "geolocation 'none'; payment 'none'; microphone 'none'; camera 'none'; autoplay 'none'";
         $link = '<https://example.com/font.woff2>; rel=preload; as=font; type="font/woff2", <https://example.com/app/script.js>; rel=preload; as=script';
@@ -30,11 +32,11 @@ class HeaderTest extends TestCase
         $conf = new Configuration(__DIR__ . '/../configuration', 'invalid_header_name');
         $conf->load();
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Header not supported.');
+        $this->expectException(HeaderException::class);
+        $this->expectExceptionMessageMatches('/Invalid header name parameter passed.*/');
 
-        $ch = new ConvertsHeader();
-        $ch->convert($conf);
+        $ch = new ConvertsHeader($conf);
+        $ch->convert();
     }
 
     public function testHowInvalidHeaderValueCheckWorks()
@@ -42,10 +44,10 @@ class HeaderTest extends TestCase
         $conf = new Configuration(__DIR__ . '/../configuration', 'invalid_header_value');
         $conf->load();
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid header format, see docs & examples.');
+        $this->expectException(HeaderException::class);
+        $this->expectExceptionMessageMatches('/Invalid header format.*/');
 
-        $h = new ConvertsHeader();
-        $h->convert($conf);
+        $h = new ConvertsHeader($conf);
+        $h->convert();
     }
 }

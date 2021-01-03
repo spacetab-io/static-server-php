@@ -1,0 +1,5 @@
+empty_index:
+  server:
+    port: 8081
+    root: ./tests/example_dist/empty_index
+

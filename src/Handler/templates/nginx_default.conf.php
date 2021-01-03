@@ -170,7 +170,7 @@ http {
         image/svg+xml;
     <?php endif;?>
 
-    # reduce the data that needs to be sent over network -- for testing environment
+    # reduce the data that needs to be sent over network
     gzip on;
     gzip_min_length 1024;
     gzip_comp_level 5;
@@ -224,6 +224,11 @@ http {
             return 200 "ok";
         }
 
+        location /__config {
+            add_header Content-Type application/json;
+            return 200 '<?=$configurationAsJson?>';
+        }
+
         <?php if ($platformSupportsAsyncIo):?>
           aio on;
           directio 512;
@@ -266,7 +271,7 @@ http {
 
             location @prerender {
                 <?php foreach($prerenderHeaders as $name => $value):?>
-                  add_header "<?=$name?>" "<?=addslashes($value)?>";
+                add_header "<?=$name?>" "<?=addslashes($value)?>";
                 <?php endforeach;?>
 
                 proxy_read_timeout 120s;
@@ -291,10 +296,10 @@ http {
                     set $prerender 0;
                 }
 
-            <?php if ($prerenderResolver):?>
+                <?php if ($prerenderResolver):?>
                 # resolve using Google's DNS/Cloudflare server to force DNS resolution and prevent caching of IPs
                 resolver <?=$prerenderResolver?>;
-            <?php endif;?>
+                <?php endif;?>
 
                 # need to redefine $request_uri if it will be "/" but $request_uri is blocked for changes
                 set $req_uri $uri;
@@ -302,14 +307,15 @@ http {
                   set $req_uri "/index";
                 }
 
-              <?php if(count($prerenderQueryParams)):?>
                 set $q "";
-              <?php foreach($prerenderQueryParams as $key):?>
+                <?php if(count($prerenderQueryParams)):?>
+                <?php foreach($prerenderQueryParams as $key):?>
                 if ($args ~ "<?php echo $key?>=([^&]*)(?=&)*") {
                   set $q "$q-<?php echo $key?>=$1";
                 }
-              <?php endforeach;?>
-              <?php endif;?>
+                <?php endforeach;?>
+                <?php endif;?>
+
                 if ($prerender = 1) {
                     #setting prerender as a variable forces DNS resolution since nginx caches IPs and doesnt play well with load balancing
                     rewrite .* <?= $CDNPath ?>$req_uri$q<?= ($CDNFilePostfix) ? "-" . $CDNFilePostfix : null ?> break;
@@ -318,9 +324,9 @@ http {
                 }
 
                 if ($prerender = 0) {
-                  <?php foreach($headers as $name => $value):?>
+                    <?php foreach($headers as $name => $value):?>
                     add_header "<?=$name?>" "<?=addslashes($value)?>";
-                  <?php endforeach;?>
+                    <?php endforeach;?>
                     expires 30m;
                     add_header "Cache-Control" "public, max-age=1800";
 
@@ -330,7 +336,7 @@ http {
         <?php else:?>
             location / {
                 <?php foreach($headers as $name => $value):?>
-                  add_header "<?=$name?>" "<?=addslashes($value)?>";
+                add_header "<?=$name?>" "<?=addslashes($value)?>";
                 <?php endforeach;?>
 
                 expires 30m;

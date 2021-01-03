@@ -1,46 +1,49 @@
-<?php declare(strict_types=1);
+<?php
 
-namespace StaticServer\Tests;
+declare(strict_types=1);
 
-use StaticServer\Server;
-use Throwable;
+namespace Spacetab\Tests\Server;
+
+use Generator;
+use Spacetab\Configuration\Configuration;
+use Spacetab\Server\Application;
 
 class ApplicationTest extends TestCase
 {
-    public function testServerInit()
+    public function setUp(): void
     {
+        parent::setUp();
+
         $path = __DIR__ . '/../tests/configuration';
-
-        try {
-            putenv('STAGE=tests');
-            putenv("CONFIG_PATH=$path");
-            Server::fromGlobals()->run(true);
-        } catch (Throwable $e) {
-            printf($e);
-            $this->assertFalse((bool) $e);
-        }
-
-        // workaround for simple check of application startup.
-        $this->assertTrue(true);
+        putenv('STAGE=tests');
+        putenv("CONFIG_PATH=$path");
+        putenv("VCS_SHA1=test");
     }
 
-    public function testServerVcsSha1()
+    public function testDump()
     {
-        $this->setOutputCallback(function () {
-            $path = __DIR__ . '/../tests/configuration';
+        Application::fromGlobals()->dump();
+        $this->expectOutputRegex('/CONFIG_PATH.*/');
+    }
 
-            try {
-                putenv('STAGE=tests');
-                putenv("CONFIG_PATH=$path");
-                putenv("VCS_SHA1=test");
-                Server::fromGlobals()->run(true);
-            } catch (Throwable $e) {
-                printf($e);
-                $this->assertFalse((bool) $e);
-            }
+    public function testGetHandlerPidPath()
+    {
+        $conf = new Configuration(__DIR__ . '/../tests/configuration', 'tests');
+        $conf->load();
 
-            // workaround for simple check of application startup.
-            $this->assertTrue(true);
-        });
+        $this->assertSame($conf->get('server.handler.options.pid'), Application::fromGlobals()->getHandlerPidPath());
+    }
+
+    public function testGetHandlerConfigPath()
+    {
+        $conf = new Configuration(__DIR__ . '/../tests/configuration', 'tests');
+        $conf->load();
+
+        $this->assertSame($conf->get('server.handler.options.config'), Application::fromGlobals()->getHandlerConfigPath());
+    }
+
+    public function testGenerate(): Generator
+    {
+        $this->assertNull(yield Application::fromGlobals()->generate());
     }
 }

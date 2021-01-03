@@ -1,0 +1,9 @@
+nginx_conf:
+  server:
+    port: 8081
+    root: ./tests/example_dist/simple
+    handler:
+      options:
+        pid: /tmp/spa_nginx.pid
+        config: /tmp/generated_nginx.conf
+

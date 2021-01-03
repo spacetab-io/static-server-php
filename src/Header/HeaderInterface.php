@@ -1,8 +1,8 @@
-<?php declare(strict_types=1);
+<?php
 
-namespace StaticServer\Header;
+declare(strict_types=1);
 
-use Spacetab\Configuration\ConfigurationInterface;
+namespace Spacetab\Server\Header;
 
 interface HeaderInterface
 {
@@ -28,8 +28,7 @@ interface HeaderInterface
      * Converts headers declared in Yaml configuration to real.
      * Due to backward compatibility.
      *
-     * @param \Spacetab\Configuration\ConfigurationInterface $conf
      * @return array<string, string>
      */
-    public function convert(ConfigurationInterface $conf): array;
+    public function convert(): array;
 }

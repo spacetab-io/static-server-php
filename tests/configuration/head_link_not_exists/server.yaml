@@ -1,0 +1,5 @@
+head_link_not_exists:
+  server:
+    port: 8081
+    root: ./tests/example_dist/head_link_not_exists
+

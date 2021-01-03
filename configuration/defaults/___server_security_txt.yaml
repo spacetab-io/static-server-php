@@ -1,0 +1,8 @@
+defaults:
+  server:
+    securityTxt:
+      contact: "security@spacetab.io"
+      preferredLang: "en, ru"
+
+
+

@@ -1,173 +1,115 @@
-<?php declare(strict_types=1);
+<?php
 
-namespace StaticServer\Handler;
+declare(strict_types=1);
 
-use InvalidArgumentException;
-use JJG\Ping;
+namespace Spacetab\Server\Handler;
+
+use Amp\Promise;
+use Amp\File;
 use League\Plates\Engine;
-use LogicException;
-use RuntimeException;
-use StaticServer\Header\HeaderInterface;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Process;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+use Spacetab\Configuration\ConfigurationInterface;
+use Spacetab\Server\Check;
+use Spacetab\Server\Header\ConvertsHeader;
+use function Amp\call;
 
-class NginxHandler extends AbstractHandler
+final class NginxHandler implements HandlerInterface
 {
-    /**
-     * @var \League\Plates\Engine
-     */
     private Engine $templates;
-
-    /**
-     * @var string
-     */
-    private string $pidFile;
-
-    /**
-     * @var string
-     */
-    private string $configFile;
-
-    /**
-     * @var bool
-     */
-    private bool $moduleBrotliInstalled = false;
-
-    /**
-     * @var bool
-     */
-    private bool $platformSupportsAsyncIo = false;
+    private ?LoggerInterface $logger;
+    private ConfigurationInterface $conf;
+    private ConvertsHeader $convertHeaders;
+    private Check $checker;
 
     /**
      * NginxHandler constructor.
      *
-     * @param array<string, string> $options
+     * @param \Spacetab\Configuration\ConfigurationInterface $conf
+     * @param \Psr\Log\LoggerInterface|null $logger
      */
-    public function __construct(array $options = [])
+    public function __construct(ConfigurationInterface $conf, ?LoggerInterface $logger = null)
     {
-        $this->templates  = new Engine(__DIR__ . DIRECTORY_SEPARATOR . 'templates');
-        $this->pidFile    = $this->expandPathLikeShell($options['pid']);
-        $this->configFile = $this->expandPathLikeShell($options['config']);
-
-        parent::__construct();
+        $this->templates      = new Engine(__DIR__ . DIRECTORY_SEPARATOR . 'templates');
+        $this->convertHeaders = new ConvertsHeader($conf);
+        $this->checker        = new Check($conf, $logger);
+        $this->logger         = $logger ?: new NullLogger();
+        $this->conf           = $conf;
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function checkDependenciesBeforeStart(): void
+    public function handle(): Promise
     {
-        $this->checkIfNginxInstalled();
-        $this->checkIfBrotliModuleInstalled();
-        $this->checkIfPlatformSupportsAsyncIo();
-        $this->checkIfPrerenderUrlIsAvailable();
-        $this->checkIfPrerenderCdnUrlIsNotEmpty();
+        $this->logger->info('Initialize the NGINX template generator...');
+
+        $pidPath = $this->conf->get('server.handler.options.pid');
+        $configPath = $this->conf->get('server.handler.options.config');
+
+        $pidDir = pathinfo($pidPath, PATHINFO_DIRNAME);
+        $configDir = pathinfo($configPath, PATHINFO_DIRNAME);
+
+        return call(function () use ($pidPath, $configPath, $pidDir, $configDir) {
+            $moduleBrotliInstalled = yield $this->checker->ensuresNginxBrotliModuleIsInstalled();
+            $supportsAsyncIo = $this->checker->ensuresPlatformSupportAsyncIo();
+
+            yield [
+                $this->checker->ensuresRootIsExistsAndIndexFound(),
+                $this->checker->ensuresPrerenderCdnUrlIsPingable(),
+                $this->checker->ensuresNginxIsInstalled(),
+            ];
+
+            $this->logger->debug('Make recursively directories for pid and config file.', compact('pidDir', 'configDir'));
+
+            yield [
+                File\filesystem()->createDirectoryRecursively($pidDir),
+                File\filesystem()->createDirectoryRecursively($configDir),
+            ];
+
+            $this->logger->debug("Touch pid file: {$pidPath}");
+
+            yield File\filesystem()->touch($pidPath);
+
+            $render = $this->templates->render(
+                'nginx_default.conf',
+                [
+                    'serverRoot'              => $this->conf->get('server.root'),
+                    'serverIndex'             => $this->conf->get('server.index'),
+                    'serverPort'              => $this->conf->get('server.port'),
+                    'serverHost'              => $this->conf->get('server.host'),
+                    'prerenderEnabled'        => $this->conf->get('server.prerender.enabled'),
+                    'prerenderCacheTTL'       => $this->conf->get('server.prerender.cacheTtl'),
+                    'prerenderQueryParams'    => $this->getSortedQueryParams(),
+                    'CDNUrl'                  => rtrim((string) $this->conf->get('server.prerender.cdnUrl'), '/'),
+                    'CDNPath'                 => rtrim((string) $this->conf->get('server.prerender.cdnPath'), '/'),
+                    'CDNFilePostfix'          => $this->conf->get('server.prerender.cdnFilePostfix'),
+                    'prerenderHeaders'        => $this->conf->get('server.prerender.headers', []),
+                    'prerenderResolver'       => $this->conf->get('server.prerender.resolver', false),
+                    'headers'                 => $this->convertHeaders->convert(),
+                    'connProcMethod'          => $this->getConnectionProcessingMethod(),
+                    'pidLocation'             => $pidPath,
+                    'moduleBrotliInstalled'   => $moduleBrotliInstalled,
+                    'platformSupportsAsyncIo' => $supportsAsyncIo,
+                    'configurationAsJson'     => $this->getConfigurationAsJson(),
+                ]
+            );
+
+            $this->logger->debug("Write NGINX configuration to `{$configDir}`");
+
+            yield File\filesystem()->write($configPath, $render);
+            yield $this->checker->ensuresNginxConfigurationIsValid();
+        });
     }
 
-    /**
-     * @param \StaticServer\Header\HeaderInterface $header
-     */
-    public function generateConfig(HeaderInterface $header): void
+    private function getConfigurationAsJson(): string
     {
-        $this->logger->info("Nginx PID location: {$this->pidFile}");
-        $this->makePathForFiles([$this->pidFile, $this->configFile]);
-        $this->touchFile($this->pidFile);
+        $config = $this->conf->all();
+        unset($config['server']);
 
-        $data = $this->templates->render(
-            'nginx_default.conf',
-            [
-                'serverRoot'              => realpath($this->getServerRoot()),
-                'serverIndex'             => $this->configuration->get('server.index'),
-                'serverPort'              => $this->configuration->get('server.port'),
-                'serverHost'              => $this->configuration->get('server.host'),
-                'prerenderEnabled'        => $this->configuration->get('server.prerender.enabled'),
-                'prerenderCacheTTL'       => $this->configuration->get('server.prerender.cacheTtl'),
-                'prerenderQueryParams'    => $this->getSorted('server.prerender.queryParams'),
-                'CDNUrl'                  => $this->getParamWithoutTrailingSlash('server.prerender.cdnUrl'),
-                'CDNPath'                 => $this->getParamWithoutTrailingSlash('server.prerender.cdnPath'),
-                'CDNFilePostfix'          => $this->configuration->get('server.prerender.cdnFilePostfix', null),
-                'prerenderHeaders'        => $this->configuration->get('server.prerender.headers', []),
-                'prerenderResolver'       => $this->configuration->get('server.prerender.resolver', false),
-                'headers'                 => $header->convert($this->configuration),
-                'connProcMethod'          => $this->getConnectionProcessingMethod(),
-                'pidLocation'             => $this->pidFile,
-                'moduleBrotliInstalled'   => $this->moduleBrotliInstalled,
-                'platformSupportsAsyncIo' => $this->platformSupportsAsyncIo,
-            ]
-        );
-
-        file_put_contents($this->configFile, $data);
+        return json_encode($config, JSON_UNESCAPED_SLASHES);
     }
 
-    public function checkConfig(): void
+    private function getSortedQueryParams(): array
     {
-        $this->runProcess(['nginx', '-c', $this->configFile, '-t']);
-    }
-
-    /**
-     * Start the web-server.
-     */
-    public function start(): void
-    {
-        $this->runProcess(
-            ['nginx', '-c', $this->configFile],
-            function () {
-                $this->logger->info(
-                    sprintf(
-                        'Server started at: %s:%d',
-                        $this->configuration->get('server.host'),
-                        $this->configuration->get('server.port')
-                    )
-                );
-            }
-        );
-    }
-
-    public function reload(): void
-    {
-        if ( ! file_exists($this->pidFile)) {
-            throw new LogicException('Can\'t reload server. Pid file not found.');
-        }
-
-        if (empty(file_get_contents($this->pidFile))) {
-            throw new LogicException('Can\'t reload server. Pid file is empty.');
-        }
-
-        $this->runProcess(['nginx', '-c', $this->configFile, '-s', 'reload']);
-    }
-
-    public function stop(): void
-    {
-        $this->runProcess(['nginx', '-c', $this->configFile, '-s', 'stop']);
-
-        if ($this->filesystem->exists($this->configFile)) {
-            $this->filesystem->remove($this->configFile);
-        }
-    }
-
-    /**
-     * @param string $key
-     *
-     * @return bool|string
-     */
-    private function getParamWithoutTrailingSlash(string $key)
-    {
-        if (empty($this->configuration->get($key))) {
-            return false;
-        }
-
-        return rtrim($this->configuration->get($key), '/');
-    }
-
-    /**
-     * @param string       $key
-     * @param array<mixed> $default
-     *
-     * @return bool|string
-     */
-    private function getSorted(string $key, array $default = [])
-    {
-        $array = $this->configuration->get($key, $default);
+        $array = $this->conf->get('server.prerender.queryParams', []);
         sort($array);
 
         return $array;
@@ -187,127 +129,6 @@ class NginxHandler extends AbstractHandler
                 return 'kqueue';
             default:
                 return 'poll';
-        }
-    }
-
-    /**
-     * @throws \Exception
-     */
-    private function checkIfPrerenderUrlIsAvailable(): void
-    {
-        if ( ! $this->configuration->get('server.prerender.enabled', false)) {
-            $this->logger->info('Prerender is not enabled, skip check.');
-
-            return;
-        }
-
-        $url = $this->configuration->get('server.prerender.cdnUrl', false);
-
-        if ( ! $url) {
-            throw new InvalidArgumentException('Prerender CDN URL not set. Check server.prerender.cdnUrl config key.');
-        }
-
-        $url = (string) parse_url($url, PHP_URL_HOST);
-
-        if (strlen($url) < 1) {
-            throw new InvalidArgumentException(
-                'Prerender CDN URL is invalid. Check server.prerender.cdnUrl config key.'
-            );
-        }
-
-        $this->logger->info('Ping prerender cdn url...');
-
-        $ping    = new Ping($url);
-        $latency = $ping->ping('fsockopen');
-
-        if ($latency !== false) {
-            $this->logger->info('Prerender cdn url is available.');
-
-            return;
-        }
-
-        $this->logger->warning('Prerender cdn url could not be reached: ' . $url);
-    }
-
-    private function checkIfPrerenderCdnUrlIsNotEmpty(): void
-    {
-        if ( ! $this->configuration->get('server.prerender.enabled', false)) {
-            return;
-        }
-
-        $this->logger->info('Checks prerender CDN url is fill and has a valid url address...');
-
-        $host = $this->configuration->get('server.prerender.cdnUrl', '');
-
-        if (strlen($host) < 1) {
-            throw new InvalidArgumentException('Prerender CDN url is empty. Check server.prerender.cdnUrl config key.');
-        }
-
-        $valid = (bool) parse_url($host);
-
-        if ( ! $valid) {
-            throw new InvalidArgumentException(
-                'Prerender CDN url is invalid (can\'t parse a url). Check server.prerender.cdnUrl config key.'
-            );
-        }
-    }
-
-    /**
-     * @return void
-     */
-    private function checkIfPlatformSupportsAsyncIo(): void
-    {
-        $this->logger->info('Check if platform supports async io...');
-
-        switch (PHP_OS_FAMILY) {
-            case 'Linux':
-            case 'BSD':
-                $this->logger->info('Platform supports async io, turning it on.');
-                $this->platformSupportsAsyncIo = true;
-                break;
-            default:
-                $this->logger->info('Platform does not supports async io, turning it off.');
-                $this->platformSupportsAsyncIo = false;
-        }
-    }
-
-    /**
-     * @return void
-     */
-    private function checkIfNginxInstalled(): void
-    {
-        $proc = new Process(['which', 'nginx']);
-
-        try {
-            $proc->mustRun();
-        } catch (ProcessFailedException $e) {
-            $this->logger->critical('Command [which nginx] failed: ' . $e->getMessage());
-            throw $e;
-        }
-
-        if (strpos($proc->getOutput(), 'nginx') === false) {
-            throw new RuntimeException('Unexpected error.');
-        }
-    }
-
-    private function checkIfBrotliModuleInstalled(): void
-    {
-        $proc = new Process(['nginx', '-V']);
-
-        try {
-            $proc->mustRun();
-        } catch (ProcessFailedException $e) {
-            $this->logger->critical('Command [nginx -V] failed: ' . $e->getMessage());
-            throw $e;
-        }
-
-        # nginx -V send outputs to STDERR. https://trac.nginx.org/nginx/ticket/592
-        if (strpos($proc->getErrorOutput(), 'brotli') === false) {
-            $this->logger->info('Nginx Brotli module not installed. Turning off this compression method.');
-            $this->moduleBrotliInstalled = false;
-        } else {
-            $this->logger->info('Nginx Brotli module installed. Turning it on.');
-            $this->moduleBrotliInstalled = true;
         }
     }
 }

@@ -1,20 +1,35 @@
-FROM roquie/composer-parallel:1
+FROM composer/composer:2 AS deps
 
 COPY . /app
 
-RUN composer install --no-ansi --no-interaction --no-progress --no-scripts --ignore-platform-reqs \
-    && vendor/bin/box compile
+RUN composer install --no-ansi --no-interaction --no-progress --no-scripts --ignore-platform-reqs
 
-FROM php:7.4-cli-alpine
+FROM spacetabio/box-php:1.0.0 AS build
 
-ENV NGINX_VERSION 1.16.1
-ENV NGX_BROTLI_COMMIT e505dce68acc190cc5a1e780a3b0275e39f160ca
+WORKDIR /app
+COPY --from=deps /app /app
+RUN box compile
+
+FROM php:8.0-cli-alpine
+
+ENV NGINX_VERSION 1.19.6
+ENV NGX_BROTLI_COMMIT 9aec15e2aa6feea2113119ba06460af70ab3ea62
 
 RUN set -xe \
     apk update --no-cache \
     && apk add --no-cache ca-certificates \
-    && docker-php-ext-install pcntl \
     && mkdir /run/nginx
+
+#    ERROR: In UvDriver.php line 531: Could not create directory
+#
+#    && apk add --no-cache autoconf g++ libtool pcre make libuv libuv-dev git ca-certificates \
+#    && docker-php-ext-configure opcache --enable-opcache \
+#    && docker-php-ext-install -j $(nproc) opcache \
+#    && git clone https://github.com/bwoebi/php-uv.git \
+#    && cd php-uv \
+#    && git checkout -b $PHP_UV_COMMIT $PHP_UV_COMMIT \
+#    && phpize && ./configure && make -j $(nproc) && make install \
+#    && docker-php-ext-enable uv
 
 RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 	&& CONFIG="\
@@ -156,12 +171,14 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 	&& ln -sf /dev/stdout /var/log/nginx/access.log \
 	&& ln -sf /dev/stderr /var/log/nginx/error.log
 
-COPY --from=0 /app/bin/server.phar /usr/bin/server
-COPY --from=0 /app/dist /app
-COPY --from=0 /app/configuration /app/configuration
+COPY --from=build /app/bin/template.phar /usr/bin/template
+COPY --from=build /app/bin/server /usr/bin/server
+COPY --from=build /app/dist /app
+COPY --from=build /app/configuration /app/configuration
 
 ENV SERVER_VERSION "{{ version }}"
-RUN chmod +x /usr/bin/server
+RUN chmod +x /usr/bin/server \
+    && chmod +x /usr/bin/template
 
 EXPOSE 8080
 WORKDIR /app

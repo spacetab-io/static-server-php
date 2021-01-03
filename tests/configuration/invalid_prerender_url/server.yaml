@@ -1,0 +1,8 @@
+invalid_prerender_url:
+  server:
+    port: 8081
+    root: ./tests/example_dist/simple
+    prerender:
+      enabled: true
+      cdnUrl: "scheme://example_login:!#Password?@ZZZ@127.0.0.1/some_path"
+

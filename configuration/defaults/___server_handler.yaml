@@ -1,0 +1,7 @@
+defaults:
+  server:
+    handler:
+      name: nginx
+      options:
+        pid: /root/.server/spa_nginx.pid
+        config: /root/.server/generated_nginx.conf

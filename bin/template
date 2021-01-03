@@ -1,0 +1,34 @@
+#!/usr/bin/env php
+<?php
+
+use Spacetab\Logger\Logger;
+use Spacetab\Server\Console\DumpCommand;
+use Spacetab\Server\Console\GenerateCommand;
+use Spacetab\Server\Console\HandlerCommand;
+use Symfony\Component\Console\Application;
+
+$locations = [
+    __DIR__ . '/../../../autoload.php',
+    __DIR__ . '/../vendor/autoload.php',
+    __DIR__ . '/vendor/autoload.php'
+];
+
+foreach ($locations as $file) {
+    if (file_exists($file)) {
+        require_once $file;
+        break;
+    }
+}
+
+$logger = Logger::default('Fatal');
+
+try {
+    $app = new Application('Static server', getenv('SERVER_VERSION'));
+    $app->add(new DumpCommand());
+    $app->add(new GenerateCommand());
+    $app->add(new HandlerCommand());
+    $app->run();
+} catch (Throwable $e) {
+    $logger->critical($e->getMessage(), ['trace' => $e->getTraceAsString()]);
+    exit(1);
+}

@@ -1,0 +1,5 @@
+defaults:
+  server:
+    logger:
+      enabled: true
+      level: info # debug, info, notice, warning, critical, emergency
