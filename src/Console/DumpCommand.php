@@ -36,7 +36,6 @@ class DumpCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        //@phpstan-ignore-next-line
         Loop::run(fn() => Application::fromGlobals()->dump());
 
         return 0;
