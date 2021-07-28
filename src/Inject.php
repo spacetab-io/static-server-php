@@ -81,16 +81,26 @@ final class Inject
         $format = $this->conf->get('server.modify.consoleLog');
         $message = sprintf($format, $stage, $vcsSha1);
 
-        $config = $this->conf->all();
-        unset($config['server']);
-
         $template = "window.__stage='%s';window.__config=JSON.parse('%s');window.__vcs='%s';console.log('%s','color:#F44336','color:#009688');";
-        $content = sprintf($template, $stage, json_encode($config), $vcsSha1, $message);
+        $content = sprintf($template, $stage, $this->getConfigurationAsJson(), $vcsSha1, $message);
 
         $this->logger->info("Inject the __config.js file to `$path`");
 
         return call(static function() use ($path, $content) {
             yield File\write($path, $content);
+        });
+    }
+
+    /**
+     * @return \Amp\Promise<null>
+     */
+    public function injectConfigJsonFile(): Promise
+    {
+        $path = rtrim($this->conf->get('server.root'), '/') . '/__config.json';
+        $this->logger->info("Inject the __config.json file to `$path`");
+
+        return call(function() use ($path) {
+            yield File\write($path, $this->getConfigurationAsJson());
         });
     }
 
@@ -213,7 +223,14 @@ final class Inject
 
         if ($head->length > 0) {
             $head->item(0)->appendChild($preload);
-            return;
         }
+    }
+
+    private function getConfigurationAsJson(): string
+    {
+        $config = $this->conf->all();
+        unset($config['server']);
+
+        return json_encode($config, JSON_UNESCAPED_SLASHES);
     }
 }

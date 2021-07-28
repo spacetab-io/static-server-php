@@ -226,7 +226,7 @@ http {
 
         location /__config {
             add_header Content-Type application/json;
-            return 200 '<?=$configurationAsJson?>';
+            try_files /__config.json =404;
         }
 
         <?php if ($platformSupportsAsyncIo):?>

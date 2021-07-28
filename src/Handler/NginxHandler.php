@@ -87,8 +87,7 @@ final class NginxHandler implements HandlerInterface
                     'connProcMethod'          => $this->getConnectionProcessingMethod(),
                     'pidLocation'             => $pidPath,
                     'moduleBrotliInstalled'   => $moduleBrotliInstalled,
-                    'platformSupportsAsyncIo' => $supportsAsyncIo,
-                    'configurationAsJson'     => $this->getConfigurationAsJson(),
+                    'platformSupportsAsyncIo' => $supportsAsyncIo
                 ]
             );
 
@@ -97,14 +96,6 @@ final class NginxHandler implements HandlerInterface
             yield File\filesystem()->write($configPath, $render);
             yield $this->checker->ensuresNginxConfigurationIsValid();
         });
-    }
-
-    private function getConfigurationAsJson(): string
-    {
-        $config = $this->conf->all();
-        unset($config['server']);
-
-        return json_encode($config, JSON_UNESCAPED_SLASHES);
     }
 
     private function getSortedQueryParams(): array

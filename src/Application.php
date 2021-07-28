@@ -80,7 +80,8 @@ final class Application
             yield [
                 $this->injector->injectSecurityTxtFile(),
                 $this->injector->injectConfigJsFile($this->stage, $this->sha1),
-                $this->injector->injectConfigJsScriptToIndexFile()
+                $this->injector->injectConfigJsScriptToIndexFile(),
+                $this->injector->injectConfigJsonFile()
             ];
 
             yield $this->handler->handle();
