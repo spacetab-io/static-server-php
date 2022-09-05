@@ -1,3 +1,22 @@
+## [4.1.0] - 2022-09-05
+
+### Added
+
+None.
+
+### Changed
+
+* Upgrades composer packages.
+* Upgrades PHP version to `8.1`
+
+### Removed
+
+None. 
+
+### Fixed
+
+* Fixes prerender host proxy (add nginx option `proxy_ssl_server_name on`).
+
 ## [4.0.0] - 2020-01-03
 
 ### Added

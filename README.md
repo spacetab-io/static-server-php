@@ -40,7 +40,7 @@ Compatible with: Vue, React, Angular, etc.
 
 ### Dockerfile sample
 ```Dockerfile
-FROM spacetabio/static-server-php:4.0.0
+FROM spacetabio/static-server-php:4.1.0
 
 ARG VCS_SHA1
 ARG STAGE

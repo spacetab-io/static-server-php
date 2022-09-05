@@ -8,7 +8,7 @@
     }
   ],
   "require": {
-    "php": "^8.0",
+    "php": "^8.1",
     "ext-dom": "*",
     "ext-json": "*",
     "ext-simplexml": "*",
@@ -17,7 +17,7 @@
     "amphp/http-client": "^4.6",
     "amphp/process": "^1.1",
     "league/plates": "^3.3",
-    "spacetab-io/configuration": "3.*",
+    "spacetab-io/configuration": "4.*",
     "spacetab-io/logger": "^2",
     "symfony/console": "^5"
   },

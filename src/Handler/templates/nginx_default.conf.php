@@ -282,6 +282,7 @@ http {
                 proxy_cache             STATIC;
                 proxy_cache_valid       200 <?=$prerenderCacheTTL?>;
                 proxy_cache_use_stale   error timeout invalid_header updating http_500 http_502 http_503 http_504;
+                proxy_ssl_server_name on;
 
                 set $prerender 0;
                 if ($http_user_agent ~* "bot|whatsapp|telegram|google|bing|yandex|baiduspider|twitterbot|facebookexternalhit|rogerbot|linkedin|embedly|quora link preview|showyoubot|outbrain|pinterest\/0\.|pinterestbot|slackbot|vkShare|W3C_Validator") {

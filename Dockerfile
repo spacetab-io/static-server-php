@@ -10,7 +10,7 @@ WORKDIR /app
 COPY --from=deps /app /app
 RUN box compile
 
-FROM php:8.0-cli-alpine
+FROM php:8.1-cli-alpine
 
 ENV NGINX_VERSION 1.21.1
 ENV NGX_BROTLI_COMMIT 9aec15e2aa6feea2113119ba06460af70ab3ea62
@@ -90,7 +90,7 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 		zlib-dev \
 		linux-headers \
 		curl \
-		gnupg1 \
+		gnupg \
 		libxslt-dev \
 		gd-dev \
 		geoip-dev \

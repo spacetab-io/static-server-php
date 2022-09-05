@@ -1,5 +1,5 @@
 IMAGE = spacetabio/static-server-php
-VERSION = 4.0.1
+VERSION = 4.1.0
 FILE = Dockerfile
 
 image:
@@ -14,13 +14,13 @@ run:
 
 test:
 	docker run -w /app --entrypoint sh --rm -it --init -v `pwd`/:/app \
-		$(IMAGE):4.0.1-xdebug -c "vendor/bin/phpunit"
+		$(IMAGE):4.1.0-xdebug -c "vendor/bin/phpunit"
 
 image_test:
-	docker build -t $(IMAGE):4.0.1-xdebug -f test.dockerfile .
+	docker build -t $(IMAGE):4.1.0-xdebug -f test.dockerfile .
 
 push_test:
-	docker push $(IMAGE):4.0.1-xdebug
+	docker push $(IMAGE):4.1.0-xdebug
 
 image_box:
 	docker build -t spacetabio/box-php:1.0.0 -f box.dockerfile .
