@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Spacetab\Server\Header;
 
+use InvalidArgumentException;
 use Spacetab\Configuration\ConfigurationInterface;
 use Spacetab\Server\Exception\HeaderException;
+use Throwable;
 
 final class ConvertsHeader implements HeaderInterface
 {
@@ -42,7 +44,11 @@ final class ConvertsHeader implements HeaderInterface
 
             // Backward compatibility.
             if (!isset($values[0]['value'])) {
-                $results[$item] = join('; ', (array) $values);
+                try {
+                    $results[$item] = implode('; ', (array) $values);
+                } catch (Throwable) {
+                    throw new InvalidArgumentException('Headers parse error. Check : symbol or indentation (use "" for escaping :).');
+                }
             }
 
             // Checks new extended format for sent headers from yaml values.
@@ -53,10 +59,10 @@ final class ConvertsHeader implements HeaderInterface
                         throw HeaderException::invalidHeaderFormat();
                     }
 
-                    $array[] = join('; ', (array) $value['value']);
+                    $array[] = implode('; ', (array) $value['value']);
                 }
 
-                $results[$item] = join(', ', $array);
+                $results[$item] = implode(', ', $array);
             }
         }
 

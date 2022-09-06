@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Spacetab\Tests\Server\Header;
 
+use InvalidArgumentException;
 use Spacetab\Configuration\Configuration;
 use Spacetab\Server\Exception\HeaderException;
 use Spacetab\Server\Header\ConvertsHeader;
@@ -46,6 +47,17 @@ class HeaderTest extends TestCase
 
         $this->expectException(HeaderException::class);
         $this->expectExceptionMessageMatches('/Invalid header format.*/');
+
+        $h = new ConvertsHeader($conf);
+        $h->convert();
+    }
+
+    public function testInvalidToStringConversionWhenHeadersParsed()
+    {
+        $conf = new Configuration(__DIR__ . '/../configuration', 'headers_warning');
+        $conf->load();
+
+        $this->expectException(InvalidArgumentException::class);
 
         $h = new ConvertsHeader($conf);
         $h->convert();

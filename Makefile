@@ -4,7 +4,7 @@ FILE = Dockerfile
 
 image:
 	sed "s/{{ version }}/$(VERSION)/g" $(FILE) > /tmp/$(FILE)
-	docker build -f /tmp/$(FILE) -t $(IMAGE):$(VERSION) .
+	docker build --platform linux/amd64 -f /tmp/$(FILE) -t $(IMAGE):$(VERSION) .
 
 push:
 	docker push $(IMAGE):$(VERSION)
@@ -17,13 +17,13 @@ test:
 		$(IMAGE):4.1.0-xdebug -c "vendor/bin/phpunit"
 
 image_test:
-	docker build -t $(IMAGE):4.1.0-xdebug -f test.dockerfile .
+	docker build --platform linux/amd64 -t $(IMAGE):4.1.0-xdebug -f test.dockerfile .
 
 push_test:
 	docker push $(IMAGE):4.1.0-xdebug
 
 image_box:
-	docker build -t spacetabio/box-php:1.0.0 -f box.dockerfile .
+	docker build --platform linux/amd64 -t spacetabio/box-php:1.1.0 -f box.dockerfile .
 
 push_box:
-	docker push spacetabio/box-php:1.0.0
+	docker push spacetabio/box-php:1.1.0

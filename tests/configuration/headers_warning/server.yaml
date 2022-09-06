@@ -1,0 +1,7 @@
+headers_warning:
+  server:
+    headers:
+      contentSecurityPolicy:
+        - "default-src 'self' data": 'https://*.teaworkshop.ru *.cdek.ru pickpoint.ru api-maps.yandex.ru maps.yandex.net https://*.jivosite.com https://*.dadata.ru sentry.io *.yandex.ru *.vk.com *.googletagmanager.com *.google-analytics.com https://*.facebook.net https://*.facebook.com'
+    port: 8081
+    root: ./tests/example_dist/simple

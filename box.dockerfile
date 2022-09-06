@@ -1,6 +1,6 @@
-FROM php:8.0-cli-alpine
+FROM --platform=amd64 php:8.1-cli-alpine
 
-RUN wget https://github.com/box-project/box/releases/download/3.11.1/box.phar \
+RUN wget https://github.com/box-project/box/releases/download/4.0.2/box.phar \
     && mv box.phar /usr/local/bin/box \
     && chmod +x /usr/local/bin/box
 

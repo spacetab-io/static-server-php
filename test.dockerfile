@@ -1,16 +1,16 @@
-FROM composer/composer:2 AS deps
+FROM --platform=amd64 composer/composer:2 AS deps
 
 COPY . /app
 
 RUN composer install --no-ansi --no-interaction --no-progress --no-scripts --ignore-platform-reqs
 
-FROM spacetabio/box-php:1.0.0 AS build
+FROM --platform=amd64 spacetabio/box-php:1.0.0 AS build
 
 WORKDIR /app
 COPY --from=deps /app /app
 RUN box compile
 
-FROM php:8.1-cli-alpine
+FROM --platform=amd64 php:8.1-cli-alpine
 
 ENV NGINX_VERSION 1.21.1
 ENV NGX_BROTLI_COMMIT 9aec15e2aa6feea2113119ba06460af70ab3ea62

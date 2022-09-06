@@ -16,6 +16,7 @@ None.
 ### Fixed
 
 * Fixes prerender host proxy (add nginx option `proxy_ssl_server_name on`).
+* User a human-readable header parser error message when user wants to use a `:` character in header values.
 
 ## [4.0.0] - 2020-01-03
 
