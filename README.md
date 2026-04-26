@@ -85,6 +85,67 @@ server supports integration with this prerender in the box:
   
 https://github.com/spacetab-io/prerender-go
 
+> **Breaking change in 5.0.0** — old `queryParams`, `cdnFilePostfix` and `cdnPath`
+> options are removed. Prerender rewrite is now configured by two raw nginx
+> snippets: `setup` (variables before `if ($prerender = 1)`) and `rewrite`
+> (rewrite-target). This gives full control over the URL pattern that bots are
+> proxied to.
+
+```yaml
+prod:
+  server:
+    prerender:
+      enabled: true
+      cdnUrl: "https://cdn.example.com"
+      # nginx variables that are then used in `rewrite` below
+      setup: |-
+        set $req_uri $uri;
+        set $suffix "/index";
+        if ($req_uri = /) {
+          set $req_uri "/index";
+          set $suffix "";
+        }
+        if ($args ~ "variation=([^&]*)(?=&)*") {
+          set $suffix "/variation=$1";
+        }
+      # raw URL passed to nginx `rewrite ... break;` (proxy_pass uses `cdnUrl`)
+      rewrite: '/prerender$req_uri$suffix'
+```
+
+Generated nginx snippet:
+
+```nginx
+location @prerender {
+    # ...bot UA matching...
+    # <setup is inlined here>
+    if ($prerender = 1) {
+        rewrite .* /prerender$req_uri$suffix break;
+        proxy_pass "https://cdn.example.com";
+        break;
+    }
+}
+```
+
+Migrating from 4.x:
+
+```yaml
+# 4.x
+prerender:
+  queryParams: [variation, color]
+  cdnPath: /prerender
+  cdnFilePostfix: 'mysuffix'
+
+# 5.x — same behaviour
+prerender:
+  setup: |-
+    set $req_uri $uri;
+    if ($req_uri = /) { set $req_uri "/index"; }
+    set $q "";
+    if ($args ~ "variation=([^&]*)(?=&)*") { set $q "$q-variation=$1"; }
+    if ($args ~ "color=([^&]*)(?=&)*")     { set $q "$q-color=$1"; }
+  rewrite: '/prerender$req_uri$q-mysuffix'
+```
+
 ### Headers
 
 By default, will be added following headers to response:

@@ -77,10 +77,9 @@ final class NginxHandler implements HandlerInterface
                     'serverHost'              => $this->conf->get('server.host'),
                     'prerenderEnabled'        => $this->conf->get('server.prerender.enabled'),
                     'prerenderCacheTTL'       => $this->conf->get('server.prerender.cacheTtl'),
-                    'prerenderQueryParams'    => $this->getSortedQueryParams(),
                     'CDNUrl'                  => rtrim((string) $this->conf->get('server.prerender.cdnUrl'), '/'),
-                    'CDNPath'                 => rtrim((string) $this->conf->get('server.prerender.cdnPath'), '/'),
-                    'CDNFilePostfix'          => $this->conf->get('server.prerender.cdnFilePostfix'),
+                    'prerenderSetup'          => (string) $this->conf->get('server.prerender.setup'),
+                    'prerenderRewrite'        => (string) $this->conf->get('server.prerender.rewrite'),
                     'prerenderHeaders'        => $this->conf->get('server.prerender.headers', []),
                     'prerenderResolver'       => $this->conf->get('server.prerender.resolver', false),
                     'headers'                 => $this->convertHeaders->convert(),
@@ -96,14 +95,6 @@ final class NginxHandler implements HandlerInterface
             yield File\filesystem()->write($configPath, $render);
             yield $this->checker->ensuresNginxConfigurationIsValid();
         });
-    }
-
-    private function getSortedQueryParams(): array
-    {
-        $array = $this->conf->get('server.prerender.queryParams', []);
-        sort($array);
-
-        return $array;
     }
 
     /**

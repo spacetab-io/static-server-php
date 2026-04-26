@@ -19,12 +19,14 @@ defaults:
     prerender:
       enabled: false
       cacheTtl: 24h # by default cache lives 24 hours
-      cdnUrl: "https://google.com"
-      cdnPath: / # CDN folder relative to root path (/)
-      cdnFilePostfix: null
+      cdnUrl: "https://google.com" # used as proxy_pass target
       url: null # Proxy pass URL for bots, with schema.
       resolver: "8.8.8.8 8.8.4.4 1.1.1.1 1.0.0.1" # nginx "resolver" option to force DNS resolution and prevent caching of IPs
       headers: [] # Authorization headers (or others), format: key - $headerName, value - $headerValue
+      setup: |-
+        set $req_uri $uri;
+        if ($req_uri = /) { set $req_uri "/index"; }
+      rewrite: '/$req_uri'
     logger:
       enabled: true
       level: info # debug, info, notice, warning, critical, emergency

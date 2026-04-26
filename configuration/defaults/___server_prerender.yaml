@@ -3,10 +3,15 @@ defaults:
     prerender: # https://github.com/spacetab-io/prerender-go
       enabled: false
       cacheTtl: 1h # by default cache lives 1 hour
-      queryParams: [] # params that will be passed to CDN to find files. Params are sorted alphabetically.
-      cdnUrl: "" # CDN url
-      cdnPath: / # CDN folder relative to root path  with trailing slash (/)
-      cdnFilePostfix: null
+      cdnUrl: "" # CDN url, used as proxy_pass target
       url: null # Proxy pass URL for bots, with schema.
       resolver: "8.8.8.8 8.8.4.4 1.1.1.1 1.0.0.1" # nginx "resolver" option to force DNS resolution and prevent caching of IPs
       headers: [] # Authorization headers (or others), format: key - $headerName, value - $headerValue
+      # `setup` — raw nginx-snippet перед `if ($prerender = 1)`. Здесь пользователь объявляет nginx-переменные,
+      # которые потом используются в `rewrite`-template.
+      setup: |-
+        set $req_uri $uri;
+        if ($req_uri = /) { set $req_uri "/index"; }
+      # `rewrite` — raw URL для nginx-директивы `rewrite ... break;`. Тут — голый nginx-синтаксис,
+      # путь до CDN-folder пишется явно. Поддерживает любые nginx-переменные.
+      rewrite: '/$req_uri'

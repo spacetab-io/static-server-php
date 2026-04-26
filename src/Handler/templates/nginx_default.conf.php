@@ -302,24 +302,13 @@ http {
                 resolver <?=$prerenderResolver?>;
                 <?php endif;?>
 
-                # need to redefine $request_uri if it will be "/" but $request_uri is blocked for changes
-                set $req_uri $uri;
-                if ($req_uri = /) {
-                  set $req_uri "/index";
-                }
-
-                set $q "";
-                <?php if(count($prerenderQueryParams)):?>
-                <?php foreach($prerenderQueryParams as $key):?>
-                if ($args ~ "<?php echo $key?>=([^&]*)(?=&)*") {
-                  set $q "$q-<?php echo $key?>=$1";
-                }
-                <?php endforeach;?>
-                <?php endif;?>
+                # User-supplied nginx snippet — должен инициализировать переменные,
+                # которые потом используются в `rewrite`-template (см. `server.prerender.rewrite`).
+<?= $prerenderSetup ?>
 
                 if ($prerender = 1) {
-                    #setting prerender as a variable forces DNS resolution since nginx caches IPs and doesnt play well with load balancing
-                    rewrite .* <?= $CDNPath ?>$req_uri$q<?= ($CDNFilePostfix) ? "-" . $CDNFilePostfix : null ?> break;
+                    # setting prerender as a variable forces DNS resolution since nginx caches IPs and doesnt play well with load balancing
+                    rewrite .* <?= $prerenderRewrite ?> break;
                     proxy_pass "<?=$CDNUrl?>";
                     break;
                 }
